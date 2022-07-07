@@ -459,7 +459,7 @@ if __name__ == '__main__':
     for i in range(len(layer1FlowSpilt)):
         print(layer1FlowSpilt[i])
         markSpiltAdjustPoint.append(layer1FlowSpilt[i][0][1])
-    print("\033[34m切除的剩余流量在:\033[0m 第" + str(splitBucketSelected + 1) + "实验的位置")
+    print("\033[34m切除的剩余流量在:\033[0m 第" + str(splitBucketSelected + 1) + "的位置上")
     print("\033[31m调整后的流量情况:\033[0m")
     print(markSpiltAdjustPoint)
 
@@ -470,7 +470,6 @@ if __name__ == '__main__':
 
     # 回收桶,统一回收剩余流量,并重新标号
     layer1FlowAllocatedAdjusted = []
-    print("\033[31m重新排序的实验情况：\033[0m")
     adjustPointCount = 0
 
     for i in range(len(layer1FlowSpilt)):
@@ -486,7 +485,6 @@ if __name__ == '__main__':
 
     print("展示流量回收之后的情况")
     # show the structure:
-
     for i in range(len(layer1FlowAllocatedAdjusted)) :
         print(layer1FlowAllocatedAdjusted[i])
 
@@ -531,4 +529,49 @@ if __name__ == '__main__':
     # 全部以最暴力的方法来解决
     # 创建跨层实验
     # 下面来新建跨层实验
+
+    print()
+    print("\033[32m重新展示第一层的流量分配情况:\033[0m")
+    for i in range(len(layer1FlowSpilt)):
+        print(layer1FlowSpilt[i])
+
+    print("\033[31m调整流量后的情况:\033[0m")
+    for i in range(len(layer1FlowAllocatedAdjusted)):
+        print(layer1FlowAllocatedAdjusted[i])
+
+    layer1FlowAdjusted = []
+    for i in range(len(layer1FlowAllocatedAdjusted)):
+        if i < splitBucketSelected :
+            layer1FlowAdjusted.append(layer1FlowAllocatedAdjusted[i])
+
+        elif i == len(layer1FlowAllocatedAdjusted) - 2 :
+            layer1BucketAdded = []
+            # 其余的每个都要加上一个常数
+            print("标记的桶位")
+            print(splitBucketMarkUpdate)
+            for j in range(len(layer1FlowAllocatedAdjusted[i])):
+                bucketId = layer1FlowAllocatedAdjusted[i][j][1] - layer1FlowAllocatedAdjusted[i][0][1] + splitBucketMarkUpdate
+                layer1BucketAdded.append([layer1FlowAllocatedAdjusted[i][j][0], bucketId])
+            layer1FlowAdjusted.append(layer1BucketAdded)
+
+        elif i == len(layer1FlowAllocatedAdjusted) - 1 :
+            layer1FlowAdjusted[i-1] = layer1FlowAdjusted[i-1] + layer1FlowAllocatedAdjusted[i]
+
+        else:
+            layer1BucketAdded = []
+            # 其余的每个都要加上一个常数
+            for j in range(len(layer1FlowAllocatedAdjusted[i])):
+                bucketId = layer1FlowAllocatedAdjusted[i][j][1]
+                bucketId -= spiltBucketNumsOut
+                layer1BucketAdded.append([layer1FlowAllocatedAdjusted[i][j][0], bucketId])
+            layer1FlowAdjusted.append(layer1BucketAdded)
+
+    print()
+    print("\033[31m回收剩余流量后的结构如下：\033[0m")
+    for i in range(len(layer1FlowAdjusted)):
+        print(layer1FlowAdjusted[i])
+
+    # layer1FLowAjusted 是调整后的流量情况
+
+
 
