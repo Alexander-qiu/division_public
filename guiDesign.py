@@ -17,21 +17,25 @@ class MY_GUI():
         self.init_window_name.title("文本处理工具_v1.2")           #窗口名
         # self.init_window_name.geometry('320x160+20+20')                         #290 160为窗口大小，+10 +10 定义窗口弹出时的默认展示位置
         self.init_window_name.geometry('1068x681+10+10')
-        #self.init_window_name["bg"] = "pink"                                    #窗口背景色，其他背景色见：blog.csdn.net/chl0000/article/details/7657887
-        #self.init_window_name.attributes("-alpha",0.9)                          #虚化，值越小虚化程度越高
+        # self.init_window_name["bg"] = "blue"                                    #窗口背景色，其他背景色见：blog.csdn.net/chl0000/article/details/7657887
+        # self.init_window_name.attributes("alpha",0.9)                          #虚化，值越小虚化程度越高
+
         #标签
         self.init_data_label = Label(self.init_window_name, text="待处理数据")
         self.init_data_label.grid(row=0, column=0)
+
         self.result_data_label = Label(self.init_window_name, text="输出结果")
         self.result_data_label.grid(row=0, column=12)
+
         self.log_label = Label(self.init_window_name, text="日志")
         self.log_label.grid(row=12, column=0)
+
         #文本框
-        self.init_data_Text = Text(self.init_window_name, width=67, height=35)  #原始数据录入框
-        self.init_data_Text.grid(row=1, column=0, rowspan=10, columnspan=10)
-        self.result_data_Text = Text(self.init_window_name, width=70, height=49)  #处理结果展示
+        self.init_data_Text = Text(self.init_window_name, width=47, height=35)  # 原始数据录入框, 输入的情况
+        self.init_data_Text.grid(row=1, column=0, rowspan=10, columnspan=10)   #
+        self.result_data_Text = Text(self.init_window_name, width=70, height=49)  # 处理结果展示
         self.result_data_Text.grid(row=1, column=12, rowspan=15, columnspan=10)
-        self.log_data_Text = Text(self.init_window_name, width=66, height=9)  # 日志框
+        self.log_data_Text = Text(self.init_window_name, width=47, height=9)  # 日志框
         self.log_data_Text.grid(row=13, column=0, columnspan=10)
         #按钮
         self.str_trans_to_md5_button = Button(self.init_window_name, text="字符串转MD5", bg="lightblue", width=10,command=self.str_trans_to_md5)  # 调用内部方法  加()为直接调用

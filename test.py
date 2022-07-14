@@ -1,11 +1,17 @@
 # encoding:utf-8
+import random
+import math
+
 import split
-
-userId = 1000
-layerId = 1
+baseLineFlowRate = 0.5
 bucketSum = 100
-MD5 = split.gen_md5(str(userId), layerId)
-print(MD5)
+overlappingExpRate = 0.05
+baseLineBucketNunms = math.ceil(baseLineFlowRate * bucketSum)
+overlappingBucketExtract = round(overlappingExpRate * bucketSum)
 
-bucketNum = split.gen_spilt(str(userId), layerId, bucketSum)
-print(bucketNum)
+lst = range(baseLineBucketNunms)
+print(lst)
+overlappingExpSelected = random.sample(lst, overlappingBucketExtract)
+print(overlappingExpSelected)  # 取出1个元素
+
+
