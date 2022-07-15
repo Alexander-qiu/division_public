@@ -12,7 +12,10 @@ def gen_md5(userId, layerId):
     layerIdStr = str(layerId)
     baseStr = ["4paradigm", "qiuruizhi", "Alexander", "polaris"]
     baseStrSelect = baseStr[layerId % len(baseStr)]
-    userIdPlusLayer = userId + baseStrSelect + layerIdStr
+    preStr = ["4paradigm", "qiuruizhi", "Alexander", "polaris", "buaa", "division"]
+    preStrSelect = baseStr[layerId % len(preStr)]
+
+    userIdPlusLayer = preStrSelect + userId + baseStrSelect + layerIdStr
 
     userIdMd5 = hashlib.md5()
     userIdMd5.update(userIdPlusLayer.encode(encoding='utf-8'))
