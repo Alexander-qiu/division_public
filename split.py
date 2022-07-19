@@ -745,11 +745,11 @@ def flow_add_inOrder(splitLayerSelected, splitBucketSelected, splitFlowRate, exp
     return layer1FlowAdjusted
 
 
-def flow_reduce(splitLayerSelected, splitBucketSelected, splitFlowRate, expMarkPointList, layerWholeAllocated, bucketSum):
+def flow_reduce(splitLayerSelected, splitBucketSelected, splitFlowRate, expBucketWholeStructureList, layerWholeAllocated, bucketSum):
     layer1FlowSpilt = []
     flowAdjustRemain = []
     flowAdjustOut = []
-    experimentMarkPointList = expMarkPointList[splitLayerSelected - 1]
+    experimentMarkPointList = expBucketWholeStructureList[splitLayerSelected - 1]
     layerToBeReallocated = layerWholeAllocated[splitLayerSelected - 1]
     print("层 \033[36m" + str(splitLayerSelected) + "\033[0m 各流量的标记点")
     print(experimentMarkPointList)
@@ -763,7 +763,7 @@ def flow_reduce(splitLayerSelected, splitBucketSelected, splitFlowRate, expMarkP
     return
 
 
-def flow_append(splitLayerSelected, splitBucketSelected, splitFlowRate, expMarkPointList, layerWholeAllocated, bucketSum):
+def flow_append(splitLayerSelected, splitBucketSelected, splitFlowRate, expBucketStructureList, layerWholeAllocated, bucketSum):
 
     return
 
