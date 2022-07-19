@@ -1,6 +1,7 @@
 # This is a sample Python script.
 import random
 
+import split
 from split import *
 from math import *
 
@@ -17,6 +18,7 @@ if __name__ == '__main__':
     (baseLineIdFlow, experimentAreaIdFlow) = \
         spilt_baseline(bucketSum=bucketSum, layerId=layerId, userId=userId,
                        baseLineFlowRate=baseLineFlowRate, userIdScale=userIdScale)
+
 
     # create the first experiment，因为是第一层实验，所以并不需要对实验进行分流，按照第一次实验的方式分流即可
     # 定义实验参数, 一个记录比例, 另一个记录实验点

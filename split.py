@@ -12,7 +12,7 @@ def gen_md5(userId, layerId):
     layerIdStr = str(layerId)
     baseStr = ["4paradigm", "qiuruizhi", "Alexander", "polaris"]
     baseStrSelect = baseStr[layerId % len(baseStr)]
-    preStr = ["4paradigm", "qiuruizhi", "Alexander", "polaris", "buaa", "division"]
+    preStr = ["4paradigm", "qiuruizhi", "Alexander", "polaris", "Cesar", "division"]
     preStrSelect = preStr[layerId % len(preStr)]
 
     userIdPlusLayer = preStrSelect + userId + baseStrSelect + layerIdStr
@@ -167,14 +167,14 @@ def experiment_mark_point(baseLineRate, bucketSum, experimentRateList):
     else:
         experimentMarkPoint = []
         remainFlow = 1 - baseLineRate
-        print("创建实验层成功，桶结点如下所示：")
+        print("创建实验层成功，实验层结构如下所示：")
         # 计算各个阶段的流量
         contentMarkPoint = baseLineRate * bucketSum
         experimentMarkPoint.append(contentMarkPoint)
         for i in range(len(experimentRateList)):
             contentMarkPoint += experimentRateList[i] * bucketSum
             experimentMarkPoint.append(contentMarkPoint)
-        print(experimentMarkPoint)
+        print(experimentRateList)
     return experimentMarkPoint
 
 
@@ -228,7 +228,7 @@ def exp_allocated_show(experimentElementNums, expMark, layer1FlowAllocated):
 
 
 # def allocatedTest
-def test_allocated_independence(userIdScale, rateList, layerWholeAllocated, expStruct):
+def test_allocated_independence(userIdScale, rateList, layerWholeAllocated, expStruct, baseLineFlowRate):
 
     wholeIdTable = [0 for i in range(userIdScale)]
     overlappingIdList = []
@@ -242,12 +242,14 @@ def test_allocated_independence(userIdScale, rateList, layerWholeAllocated, expS
         layerSelect = expStruct[i][0] - 1
         rateSelect = expStruct[i][1] - 1
         rateInTest.append(rateList[layerSelect][rateSelect])
-    print("\033[31m抽取的比例列表\033[0m")
-    print(rateInTest)
-    print(expStruct)
+    # print("\033[31m抽取的比例列表\033[0m")
+    # print(rateInTest)
+    # print(expStruct)
 
     for rate in rateInTest:
         numberInTheory *= rate
+        numberInTheory /= (1-baseLineFlowRate)
+    numberInTheory *= (1-baseLineFlowRate)
     # print("\033[31m理论上的人员数目:\033[0m")
     # print(numberInTheory)
 
@@ -256,10 +258,10 @@ def test_allocated_independence(userIdScale, rateList, layerWholeAllocated, expS
         # layerSelect = expStruct[layerCount][0] - 1
         flowSelect = expStruct[layerCount][1] - 1
         # 三个维度实验层 流量分块, 第一步是抽取实验层, 总体结构是没问题的
-        print("第" + str(layerCount+1) + "层抽取了第" + str(flowSelect+1) + "个实验" )
+        # print("第" + str(layerCount+1) + "层抽取了第" + str(flowSelect+1) + "个实验" )
         layerExp = layerWholeAllocated[layerCount][flowSelect]
         # print(layerExp)
-        print("\033[34m 抽取的比例是: " + str(rateInTest[layerCount]) + " 抽取的数目是: " + str(len(layerExp)) + "\033[0m")
+        # print("\033[34m 抽取的比例是: " + str(rateInTest[layerCount]) + " 抽取的数目是: " + str(len(layerExp)) + "\033[0m")
         # 这一部分没问题
         userIdElementList = []
 
@@ -277,13 +279,13 @@ def test_allocated_independence(userIdScale, rateList, layerWholeAllocated, expS
             overlappingIdCount += 1
             overlappingIdList.append(userIdCode)
 
-    print("\033[31m理论上的人员数目:\033[0m")
-    print(numberInTheory)
-    print("\033[31m重叠的层内同时经过实验的的Id数量：\033[0m")
-    print(overlappingIdCount)
+    # print("\033[31m理论上的人员数目:\033[0m")
+    # print(numberInTheory)
+    # print("\033[31m重叠的层内同时经过实验的的Id数量：\033[0m")
+    # print(overlappingIdCount)
     # print("\033[31m Id统计：\033[0m")
     # print(overlappingIdList)
-    print()
+    # print()
 
     particleOverTheory = overlappingIdCount/ numberInTheory
     return [rateInTest, round(numberInTheory), overlappingIdCount, round(particleOverTheory, 2)]
@@ -298,12 +300,13 @@ def generate_two_layers_combination(rateList):
             lay1 = i + 1
             lay2 = j + 1
             expStructList.append([[1, lay1], [2, lay2]])
-    print("全部的组合情况：")
-    print(expStructList)
+    # print("全部的组合情况：")
+    # print(expStructList)
     return expStructList
 
 
-def exp_allocated_independence_show(layerListShow, expNumsListShow, userIdScale, expRateList, layerWholeAllocated):
+def exp_allocated_independence_show(layerListShow, expNumsListShow, userIdScale, baseLineFlowRate,
+                                    expRateList, layerWholeAllocated):
     # # show the allocated
     [layer1, layer2, layer3] = layerListShow
     [experimentOneNums, experimentTwoNums, experimentThreeNums] = expNumsListShow
@@ -314,24 +317,22 @@ def exp_allocated_independence_show(layerListShow, expNumsListShow, userIdScale,
     experimentRateList2 = expRateList[1]
     experimentRateList3 = expRateList[2]
 
-    print()
-    print("\033[34m理论上第一层的分配人数情况：\033[0m")
-    print([round(i * userIdScale) for i in experimentRateList1])
-    print("\033[31m第一个实验的分配人数情况：\033[0m")
-    print(MemberInExpOne)
-    print("\033[34m理论上第二层的分配人数情况：\033[0m")
-    print([round(i * userIdScale) for i in experimentRateList2])
-    print("\033[31m第二个实验的分配人数情况：\033[0m")
-    print(MemberInExpTwo)
-    print("\033[34m理论上第三层的分配人数情况：\033[0m")
-    print([round(i * userIdScale) for i in experimentRateList3])
-    print("\033[31m第三个实验的分配人数情况：\033[0m")
-    print(MemberInExpThree)
+    # 封装成函数看看
+    # print()
+    # print("\033[34m理论上第一层的分配人数情况：\033[0m")
+    # print([round(i * userIdScale) for i in experimentRateList1])
+    # print("\033[31m第一个实验的分配人数情况：\033[0m")
+    # print(MemberInExpOne)
+    # print("\033[34m理论上第二层的分配人数情况：\033[0m")
+    # print([round(i * userIdScale) for i in experimentRateList2])
+    # print("\033[31m第二个实验的分配人数情况：\033[0m")
+    # print(MemberInExpTwo)
+    # print("\033[34m理论上第三层的分配人数情况：\033[0m")
+    # print([round(i * userIdScale) for i in experimentRateList3])
+    # print("\033[31m第三个实验的分配人数情况：\033[0m")
+    # print(MemberInExpThree)
 
     # # 流量测试，看是否能复合重叠的标准和要求
-    # 定义抽取的跨层实验结构
-    # 假设输入的数据结构是完全正确的
-    # 全部测试
     expStruct = []
     layerExpBase1 = [1, 1]
     expStruct.append(layerExpBase1)
@@ -349,7 +350,9 @@ def exp_allocated_independence_show(layerListShow, expNumsListShow, userIdScale,
     for i in range(len(expStructList)):
         expStruct = expStructList[i]
         testResult = test_allocated_independence(userIdScale=userIdScale, rateList=expRateList,
-                                                 layerWholeAllocated=layerWholeAllocated, expStruct=expStruct)
+                                                 baseLineFlowRate=baseLineFlowRate,
+                                                 layerWholeAllocated=layerWholeAllocated,
+                                                 expStruct=expStruct)
         testResultList.append(testResult)
 
     testResultRateExtract = get_list_inorder(testResultList, 0)
@@ -357,8 +360,8 @@ def exp_allocated_independence_show(layerListShow, expNumsListShow, userIdScale,
     testResultMemberNumsInParticle = get_list_inorder(testResultList, 2)
     testResultBiasRate = get_list_inorder(testResultList, 3)
 
-    print("\033[031m抽取的跨层实验比例:\033[0m")
-    print(testResultRateExtract)
+    # print("\033[031m跨层实验比例:\033[0m")
+    # print(testResultRateExtract)
     print("\033[031m理论上的人员数目:\033[0m")
     print(testResultMemberNumsInTheory)
     print("\033[031m重叠层内的通过重叠实验的ID数量:\033[0m")
@@ -370,7 +373,7 @@ def exp_allocated_independence_show(layerListShow, expNumsListShow, userIdScale,
 
 
 # 流量减小操作
-def flow_reduce_sdk(splitLayerSelected, splitBucketSelected, splitFlowRate, expMarkPointList, layerWholeAllocated, bucketSum):
+def flow_reduce_inOrder(splitLayerSelected, splitBucketSelected, splitFlowRate, expMarkPointList, layerWholeAllocated, bucketSum):
 
     layer1FlowSpilt = []
     flowAdjustRemain = []
@@ -380,8 +383,8 @@ def flow_reduce_sdk(splitLayerSelected, splitBucketSelected, splitFlowRate, expM
     print("层 \033[36m"+str(splitLayerSelected)+"\033[0m 各流量的标记点")
     print(experimentMarkPointList1)
     adjustMarkPoint = experimentMarkPointList1[splitBucketSelected] - splitFlowRate * bucketSum
-    print("分割桶的标记位置")
-    print(adjustMarkPoint)
+    # print("分割桶的标记位置")
+    # print(adjustMarkPoint)
 
     for i in range(len(layer1FlowAllocated)):
         if i == splitBucketSelected - 1:
@@ -399,14 +402,13 @@ def flow_reduce_sdk(splitLayerSelected, splitBucketSelected, splitFlowRate, expM
 
     # 标记结束后的情况
     markSpiltAdjustPoint = []
-    print()
+    # print()
     # print("\033[32m调整流量后实验层"+str(splitLayerSelected)+"的分配情况:\033[0m")
     for i in range(len(layer1FlowSpilt)):
         # print(layer1FlowSpilt[i])
         markSpiltAdjustPoint.append(layer1FlowSpilt[i][0][1])
-    print("\033[34m切除的流量在:\033[0m 第" + str(splitBucketSelected + 1) + "个桶的位置上")
-    print("选择第\033[32m " + str(splitLayerSelected) + " \033[0m层")
-    print("分割第\033[32m " + str(splitBucketSelected) + " \033[0m个实验")
+    # print("\033[34m切除的流量在:\033[0m 第" + str(splitBucketSelected + 1) + "个区段的位置上")
+    print("选择第\033[32m " + str(splitLayerSelected) + " \033[0m层，第\033[32m " + str(splitBucketSelected) + " \033[0m个实验")
 
     # 回收桶,统一回收剩余流量,并重新标号
     layer1FlowAllocatedAdjusted = []
@@ -423,11 +425,11 @@ def flow_reduce_sdk(splitLayerSelected, splitBucketSelected, splitFlowRate, expM
             layer1FlowAllocatedAdjusted.append(layer1FlowSpilt[adjustPointCount])
             adjustPointCount += 1
 
-    print("\033[31m调整后的流量标记桶:\033[0m")
-    print(markSpiltAdjustPoint)
+    # print("\033[31m调整后的流量标记桶:\033[0m")
+    # print(markSpiltAdjustPoint)
     spiltBucketNumsOut = markSpiltAdjustPoint[splitBucketSelected + 1] - markSpiltAdjustPoint[splitBucketSelected]
-    print("减少并回收流量\033[32m " + str(spiltBucketNumsOut) + " \033[0m个桶")
-    print("回收桶的标记位置:\033[32m " + str(adjustMarkPoint) + " <--> " + str(adjustMarkPoint + spiltBucketNumsOut) + " \033[0m")
+    # print("减少并回收流量\033[32m " + str(spiltBucketNumsOut) + " \033[0m个桶")
+    # print("回收桶的标记位置:\033[32m " + str(adjustMarkPoint) + " <--> " + str(adjustMarkPoint + spiltBucketNumsOut) + " \033[0m")
 
     splitBucketAdjustedMarkContent = []
     for i in range(len(markSpiltAdjustPoint)):
@@ -494,7 +496,7 @@ def flow_reduce_sdk(splitLayerSelected, splitBucketSelected, splitFlowRate, expM
     return layer1FlowAdjusted
 
 
-def flow_add_sdk(splitLayerSelected, splitBucketSelected, splitFlowRate, expMarkPointList, layerWholeAllocated, bucketSum):
+def flow_add_inOrder(splitLayerSelected, splitBucketSelected, splitFlowRate, expMarkPointList, layerWholeAllocated, bucketSum):
 
     # 下面是对层的流量
     layer1FlowSpilt = []
@@ -529,33 +531,30 @@ def flow_add_sdk(splitLayerSelected, splitBucketSelected, splitFlowRate, expMark
         else:
             layer1FlowSpilt.append(layer1FlowAllocated[i])
 
-
     # 标记结束后的情况
     markSpiltAdjustPoint = []
-    print()
+    # print()
     # print("\033[32m调整流量后实验层" + str(splitLayerSelected) + "的分配情况:\033[0m")
     for i in range(len(layer1FlowSpilt)):
         # print(layer1FlowSpilt[i])
         markSpiltAdjustPoint.append(layer1FlowSpilt[i][0][1])
 
-    print("\033[34m分配增加的流量在:\033[0m 第" + str(len(layer1FlowAllocated)) + "个桶的位置上")
-    print("\033[31m调整后的流量情况:\033[0m")
-    print(markSpiltAdjustPoint)
+    # print("\033[34m分配增加的流量在:\033[0m 第" + str(len(layer1FlowAllocated)) + "个桶的位置上")
+    # print("\033[31m调整后的流量情况:\033[0m")
+    # print(markSpiltAdjustPoint)
 
-    print()
-    print("选择第\033[32m " + str(splitLayerSelected) + " \033[0m层")
-    print("分割第\033[32m " + str(splitBucketSelected) + " \033[0m个实验")
+    # print()
+    print("选择第\033[32m " + str(splitLayerSelected) + " \033[0m层，第\033[32m " + str(splitBucketSelected) + " \033[0m个实验")
 
     # 回收桶,统一回收剩余流量,并重新标号
     layer1FlowAllocatedAdjusted = []
-    adjustPointCount = 0
 
-    print("\033[31m调整后的流量标记桶:\033[0m")
-    print(markSpiltAdjustPoint)
+    # print("\033[31m调整后的流量标记桶:\033[0m")
+    # print(markSpiltAdjustPoint)
     spiltBucketNumsOut = markSpiltAdjustPoint[len(markSpiltAdjustPoint)-1] - markSpiltAdjustPoint[len(markSpiltAdjustPoint)-2]
-    print("减少并回收流量\033[32m " + str(spiltBucketNumsOut) + " \033[0m个桶")
-    print("增添的桶的位置:\033[32m " + str(markSpiltAdjustPoint[splitBucketSelected]) + " <--> " +
-          str(markSpiltAdjustPoint[splitBucketSelected] + spiltBucketNumsOut) + " \033[0m")
+    # print("减少并回收流量\033[32m " + str(spiltBucketNumsOut) + " \033[0m个桶")
+    # print("增添的桶的位置:\033[32m " + str(markSpiltAdjustPoint[splitBucketSelected]) + " <--> " +
+    #       str(markSpiltAdjustPoint[splitBucketSelected] + spiltBucketNumsOut) + " \033[0m")
 
     splitBucketAdjustedMarkContent = []
     # [50, 60, 65, 80, 85]
@@ -625,22 +624,166 @@ def flow_add_sdk(splitLayerSelected, splitBucketSelected, splitFlowRate, expMark
     #     print(layer1FlowAdjusted[i])
     return layer1FlowAdjusted
 
+    layer1FlowSpilt = []
+    flowAdjustRemain = []
+    flowAdjustOut = []
+    experimentMarkPointList1 = expMarkPointList[splitLayerSelected - 1]
+    layer1FlowAllocated = layerWholeAllocated[splitLayerSelected - 1]
+    print("层 \033[36m"+str(splitLayerSelected)+"\033[0m 各流量的标记点")
+    print(experimentMarkPointList1)
+    adjustMarkPoint = experimentMarkPointList1[splitBucketSelected] - splitFlowRate * bucketSum
+    # print("分割桶的标记位置")
+    # print(adjustMarkPoint)
+
+    for i in range(len(layer1FlowAllocated)):
+        if i == splitBucketSelected - 1:
+            # layer1FlowSpilt.append(layer1FlowAllocated[i])
+            # layer1FlowSpilt.append(layer1FlowAllocated[i])
+            for j in range(len(layer1FlowAllocated[i])):
+                if layer1FlowAllocated[i][j][1] < adjustMarkPoint:
+                    flowAdjustRemain.append(layer1FlowAllocated[i][j])
+                else:
+                    flowAdjustOut.append(layer1FlowAllocated[i][j])
+            layer1FlowSpilt.append(flowAdjustRemain)
+            layer1FlowSpilt.append(flowAdjustOut)
+        else:
+            layer1FlowSpilt.append(layer1FlowAllocated[i])
+
+    # 标记结束后的情况
+    markSpiltAdjustPoint = []
+    # print()
+    # print("\033[32m调整流量后实验层"+str(splitLayerSelected)+"的分配情况:\033[0m")
+    for i in range(len(layer1FlowSpilt)):
+        # print(layer1FlowSpilt[i])
+        markSpiltAdjustPoint.append(layer1FlowSpilt[i][0][1])
+    # print("\033[34m切除的流量在:\033[0m 第" + str(splitBucketSelected + 1) + "个区段的位置上")
+    print("选择第\033[32m " + str(splitLayerSelected) + " \033[0m层，第\033[32m " + str(splitBucketSelected) + " \033[0m个实验")
+
+    # 回收桶,统一回收剩余流量,并重新标号
+    layer1FlowAllocatedAdjusted = []
+    adjustPointCount = 0
+
+    for i in range(len(layer1FlowSpilt)):
+        if i == splitBucketSelected:
+            # 跳过
+            adjustPointCount += 1
+        elif i == len(layer1FlowSpilt) - 1:
+            layer1FlowAllocatedAdjusted.append(layer1FlowSpilt[splitBucketSelected])
+            layer1FlowAllocatedAdjusted.append(layer1FlowSpilt[i])
+        else:
+            layer1FlowAllocatedAdjusted.append(layer1FlowSpilt[adjustPointCount])
+            adjustPointCount += 1
+
+    # print("\033[31m调整后的流量标记桶:\033[0m")
+    # print(markSpiltAdjustPoint)
+    spiltBucketNumsOut = markSpiltAdjustPoint[splitBucketSelected + 1] - markSpiltAdjustPoint[splitBucketSelected]
+    # print("减少并回收流量\033[32m " + str(spiltBucketNumsOut) + " \033[0m个桶")
+    # print("回收桶的标记位置:\033[32m " + str(adjustMarkPoint) + " <--> " + str(adjustMarkPoint + spiltBucketNumsOut) + " \033[0m")
+
+    splitBucketAdjustedMarkContent = []
+    for i in range(len(markSpiltAdjustPoint)):
+        if i <= splitBucketSelected:
+            splitBucketAdjustedMarkContent.append(markSpiltAdjustPoint[i])
+        elif i == len(markSpiltAdjustPoint) - 1:
+            splitBucketAdjustedMarkContent.append(markSpiltAdjustPoint[i])
+        else:
+            splitBucketMarkUpdate = markSpiltAdjustPoint[i + 1] - spiltBucketNumsOut
+            splitBucketAdjustedMarkContent.append(splitBucketMarkUpdate)
+    # print("\033[34m重新标记划分后的流量标号(暂存未合并):\033[0m")
+    # print(splitBucketAdjustedMarkContent)
+
+    splitBucketAdjustedMark = []
+    adjustFlowMarkCount = 0
+    for i in range(len(markSpiltAdjustPoint) - 1):
+        if i <= splitBucketSelected:
+            splitBucketAdjustedMark.append(markSpiltAdjustPoint[i])
+        else:
+            splitBucketMarkUpdate = markSpiltAdjustPoint[i + 1] - spiltBucketNumsOut
+            splitBucketAdjustedMark.append(splitBucketMarkUpdate)
+    print("\033[34m合并后的流量标号:\033[0m")
+    print(splitBucketAdjustedMark)
+
+    # 全部以最暴力的方法来解决
+    # 创建跨层实验
+    # 下面来新建跨层实验
+    # print()
+    # print("\033[32m切割后的的流量分配情况:\033[0m")
+    # for i in range(len(layer1FlowSpilt)):
+    #     print(layer1FlowSpilt[i])
+    #
+    # print("\033[31m调整流量后的情况:\033[0m")
+    # for i in range(len(layer1FlowAllocatedAdjusted)):
+    #     print(layer1FlowAllocatedAdjusted[i])
+
+    layer1FlowAdjusted = []
+    for i in range(len(layer1FlowAllocatedAdjusted)):
+        if i < splitBucketSelected:
+            layer1FlowAdjusted.append(layer1FlowAllocatedAdjusted[i])
+
+        elif i == len(layer1FlowAllocatedAdjusted) - 2:
+            layer1BucketAdded = []
+            # 其余的每个都要加上一个常数
+            # print("\033[36m标记的桶位\033[0m")
+            # print(splitBucketMarkUpdate)
+            for j in range(len(layer1FlowAllocatedAdjusted[i])):
+                bucketId = layer1FlowAllocatedAdjusted[i][j][1] - layer1FlowAllocatedAdjusted[i][0][
+                    1] + splitBucketMarkUpdate
+                layer1BucketAdded.append([layer1FlowAllocatedAdjusted[i][j][0], bucketId])
+            layer1FlowAdjusted.append(layer1BucketAdded)
+
+        elif i == len(layer1FlowAllocatedAdjusted) - 1:
+            layer1FlowAdjusted[i - 1] = layer1FlowAdjusted[i - 1] + layer1FlowAllocatedAdjusted[i]
+
+        else:
+            layer1BucketAdded = []
+            # 其余的每个都要加上一个常数
+            for j in range(len(layer1FlowAllocatedAdjusted[i])):
+                bucketId = layer1FlowAllocatedAdjusted[i][j][1]
+                bucketId -= spiltBucketNumsOut
+                layer1BucketAdded.append([layer1FlowAllocatedAdjusted[i][j][0], bucketId])
+            layer1FlowAdjusted.append(layer1BucketAdded)
+    return layer1FlowAdjusted
+
+
+def flow_reduce(splitLayerSelected, splitBucketSelected, splitFlowRate, expMarkPointList, layerWholeAllocated, bucketSum):
+    layer1FlowSpilt = []
+    flowAdjustRemain = []
+    flowAdjustOut = []
+    experimentMarkPointList = expMarkPointList[splitLayerSelected - 1]
+    layerToBeReallocated = layerWholeAllocated[splitLayerSelected - 1]
+    print("层 \033[36m" + str(splitLayerSelected) + "\033[0m 各流量的标记点")
+    print(experimentMarkPointList)
+    adjustMarkPoint = experimentMarkPointList[splitBucketSelected] - splitFlowRate * bucketSum
+    print("分割桶的标记位置")
+    print(adjustMarkPoint)
+    for i in range(len(layerToBeReallocated)):
+        print(layerToBeReallocated[i])
+    # BucketId  = get_list_inorder(baseList=, order=)
+
+    return
+
+
+def flow_append(splitLayerSelected, splitBucketSelected, splitFlowRate, expMarkPointList, layerWholeAllocated, bucketSum):
+
+    return
+
 
 def overlappingExpGen(baseLineBucketNums, overlappingExpRate, baseLineIdFlow, bucketSum):
-    overlappingBucketExtract = round(overlappingExpRate * bucketSum)
+    overlappingBucketExtractNums = round(overlappingExpRate * bucketSum)  #定义数目
     lst = []
     for i in range(baseLineBucketNums):
         lst.append(i)
+
     # print(lst)
-    overlappingExtract = random.sample(lst, overlappingBucketExtract)
-    print("baseLine中抽取的桶号")
-    print(overlappingExtract)  # 取出1个元素
+    overlappingExtract = random.sample(lst, overlappingBucketExtractNums)  # 从桶号中抽取桶号
+    # print("baseLine中抽取的桶号")
+    # print(overlappingExtract)  # 取出1个元素
 
     overlappingExpExtract = []
     baseLineRefreshed = []
 
-    lstRefresh = list(filter(lambda x: x not in overlappingExtract, lst))
-
+    lstRefresh = list(filter(lambda x: x not in overlappingExtract, lst)) # 剩下的桶号漏过去
+    # 还是得自己写这个逻辑
     for i in range(len(baseLineIdFlow)):
         if baseLineIdFlow[i][1] in overlappingExtract:
             overlappingExpExtract.append(baseLineIdFlow[i])
@@ -648,3 +791,29 @@ def overlappingExpGen(baseLineBucketNums, overlappingExpRate, baseLineIdFlow, bu
             baseLineRefreshed.append(baseLineIdFlow[i])
 
     return [overlappingExtract, baseLineRefreshed, lstRefresh]
+
+
+def regionId_flow_gen(userIdFlow, regionRate):
+    regionIdFlow = []
+    randCont = 0
+    selectedRegionMark = 1
+    otherRegion = 0
+    for i in range(len(userIdFlow)):
+        randCont = random.random()
+        if randCont < regionRate:
+            regionIdFlow.append(selectedRegionMark)
+        else:
+            regionIdFlow.append(otherRegion)
+    return regionIdFlow
+
+
+
+def region_division(userIdFlow ,regionIdFlow):
+    regionExtracted = []
+    regionRemain = []
+    for i in range(len(userIdFlow)):
+        if regionIdFlow[i] == 0:
+            regionRemain.append(userIdFlow[i])
+        else:
+            regionExtracted.append(userIdFlow[i])
+    return [regionExtracted, regionRemain]
