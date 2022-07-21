@@ -180,6 +180,7 @@ def experiment_mark_point(baseLineRate, bucketSum, experimentRateList):
 
 # correct
 def experiment_flow_allocation(expLayerSlected, experimentMarkPointList, bucketSum):
+    # 分配实验的算法也进行改变
     flowAllocatedReturn = []
     countStart = round(experimentMarkPointList[0])
     count = 0  # 记录第一个标记点
@@ -196,13 +197,6 @@ def experiment_flow_allocation(expLayerSlected, experimentMarkPointList, bucketS
                 singleExpAllocated.append(expLayerSlected[count])
                 count += 1
         flowAllocatedReturn.append(singleExpAllocated)
-    # 展示结构
-    # print("标号位置")
-    # print(experimentMarkPointList)
-    #
-    # for i in range(len(flowAllocatedReturn)):
-    #     print("\033[31m 第" +  str(i+1) + "个实验的分配情况\033[0m")
-    #     print(flowAllocatedReturn[i])
     return flowAllocatedReturn
 
 
@@ -747,24 +741,183 @@ def flow_add_inOrder(splitLayerSelected, splitBucketSelected, splitFlowRate, exp
 
 def flow_reduce(splitLayerSelected, splitBucketSelected, splitFlowRate, expBucketWholeStructureList, layerWholeAllocated, bucketSum):
     layer1FlowSpilt = []
-    flowAdjustRemain = []
-    flowAdjustOut = []
-    experimentMarkPointList = expBucketWholeStructureList[splitLayerSelected - 1]
+    remainedFlowUpdate = []
+    flowAdjustExtract = []
+    for i in range(len(expBucketWholeStructureList)):
+        print(expBucketWholeStructureList[i])
+    experimentFlowList = expBucketWholeStructureList[splitLayerSelected - 1]
     layerToBeReallocated = layerWholeAllocated[splitLayerSelected - 1]
-    print("层 \033[36m" + str(splitLayerSelected) + "\033[0m 各流量的标记点")
-    print(experimentMarkPointList)
-    adjustMarkPoint = experimentMarkPointList[splitBucketSelected] - splitFlowRate * bucketSum
-    print("分割桶的标记位置")
-    print(adjustMarkPoint)
+
+    reduceExperimentNums = round(splitFlowRate * bucketSum)
+    print(reduceExperimentNums)
+
+    print("层 \033[36m" + str(splitLayerSelected) + "\033[0m 各流量分配的实验情况")
+    for i in range(len(experimentFlowList)):
+        print(experimentFlowList[i])
+    remainedBuckets = experimentFlowList[splitBucketSelected - 1]
+    remainedFlow = layerToBeReallocated[i]
+    expFlowSelected = layerToBeReallocated[splitBucketSelected - 1]
+
+    # print("剩余流量")
+    # print(remainedFlow)
+    reduceExtract = random.sample(remainedBuckets, reduceExperimentNums)  # 从桶号中抽取桶号
+    print("bucket get")
+    print(reduceExtract)
+
+    for i in range(len(expFlowSelected)):
+        if expFlowSelected[i][1] in reduceExtract:
+            flowAdjustExtract.append(expFlowSelected[i])
+        else:
+            remainedFlowUpdate.append(expFlowSelected[i])
+
+    # print("回收的的流量")
+    # print(flowAdjustExtract)
+    # print("该实验层的剩余流量")
+    # print(remainedFlowUpdate)
+    # print()
+    experimentFlowList[len(experimentFlowList) - 1] = experimentFlowList[len(experimentFlowList) - 1] + reduceExtract
+    experimentFlowList[splitBucketSelected - 1] = list(
+        filter(lambda x: x not in reduceExtract, experimentFlowList[splitBucketSelected - 1]))
+    print("层 \033[36m" + str(splitLayerSelected) + "\033[0m 各流量重新分配后的实验情况")
+    for i in range(len(experimentFlowList)):
+        print(experimentFlowList[i])
+
+    reallocatedScale = len(layerToBeReallocated)
+    layerToBeReallocated[splitBucketSelected - 1] = flowAdjustExtract
+    layerToBeReallocated[len(layerToBeReallocated) - 1] = layerToBeReallocated[len(layerToBeReallocated) - 1] + remainedFlowUpdate
+    # for i in range(len(layerToBeReallocated)):
+    #     print(layerToBeReallocated[i])
+
+    return [layerToBeReallocated, experimentFlowList]
+
+
+def flow_append(splitLayerSelected, splitBucketSelected, splitFlowRate, expBucketWholeStructureList, layerWholeAllocated, bucketSum):
+    expRateUpdate = []
+    remainedFlowUpdate = []
+    flowAdjustExtract = []
+    experimentFlowList = expBucketWholeStructureList[splitLayerSelected - 1]
+    layerToBeReallocated = layerWholeAllocated[splitLayerSelected - 1]
+
+    reduceExperimentNums = round(splitFlowRate * bucketSum)
+    # print(reduceExperimentNums)
+
+    print("层 \033[36m" + str(splitLayerSelected) + "\033[0m 各流量分配的实验情况")
+    for i in range(len(experimentFlowList)):
+        print(experimentFlowList[i])
+    remainedBuckets = experimentFlowList[i]
+    remainedFlow = layerToBeReallocated[i]
+    layerAppendFlow = layerToBeReallocated[splitBucketSelected - 1]
+
+    # print("剩余流量")
+    # print(remainedFlow)
+    reduceExtract = random.sample(remainedBuckets, reduceExperimentNums)  # 从桶号中抽取桶号
+    print("bucket get:")
+    print(reduceExtract)
+
+    for i in range(len(remainedFlow)):
+        if remainedFlow[i][1] in reduceExtract:
+            layerAppendFlow.append(remainedFlow[i])
+            flowAdjustExtract.append(remainedFlow[i])
+        else:
+            remainedFlowUpdate.append(remainedFlow[i])
+
+    # print("额外增加的流量")
+    # print(flowAdjustExtract)
+    # print("增添后的流量情况")
+    # print(layerAppendFlow)
+    # print("剩余流量")
+    # print(remainedFlowUpdate)
+    print()
+    experimentFlowList[splitBucketSelected - 1] = experimentFlowList[splitBucketSelected - 1] + reduceExtract
+    experimentFlowList[len(experimentFlowList) - 1] = list(filter(lambda x: x not in reduceExtract, experimentFlowList[len(experimentFlowList)-1]))
+
+    print("层 \033[36m" + str(splitLayerSelected) + "\033[0m 各流量重新分配后的实验情况")
+    for i in range(len(experimentFlowList)):
+        print(experimentFlowList[i])
+
+    reallocatedScale = len(layerToBeReallocated)
+    layerToBeReallocated[reallocatedScale-1] = remainedFlowUpdate
+    layerToBeReallocated[splitBucketSelected-1] = layerAppendFlow
+
+    # for i in range(len(layerToBeReallocated)):
+    #     print(len(layerToBeReallocated[i]))
+
+    return [layerToBeReallocated, experimentFlowList]
+
+
+def create_new_experiment(expLayerSelected, expFlowAllocated, expBucketWholeStructureList, layerWholeAllocated, bucketSum):
+    layer1FlowSpilt = []
+    remainedFlowUpdate = []
+    flowAdjustExtract = []
+    for i in range(len(expBucketWholeStructureList)):
+        print(expBucketWholeStructureList[i])
+    experimentFlowList = expBucketWholeStructureList[expLayerSelected - 1]
+    layerToBeReallocated = layerWholeAllocated[expLayerSelected - 1]
+
+    reduceExperimentNums = round(expFlowAllocated * bucketSum)
+    print(reduceExperimentNums)
+
+    print("层 \033[36m" + str(expLayerSelected) + "\033[0m 各流量分配的实验情况")
+    for i in range(len(experimentFlowList)):
+        print(experimentFlowList[i])
+    remainedBuckets = experimentFlowList[i]
+    remainedFlow = layerToBeReallocated[i]
+
+    print("剩余流量")
+    reduceExtract = random.sample(remainedBuckets, reduceExperimentNums)  # 从桶号中抽取桶号
+    print("bucket get")
+    print(reduceExtract)
+    print(remainedFlow)
+
+    for i in range(len(remainedFlow)):
+        if remainedFlow[i][1] in reduceExtract:
+            flowAdjustExtract.append(remainedFlow[i])
+        else:
+            remainedFlowUpdate.append(remainedFlow[i])
+
+    print("额外增加的流量")
+    print(flowAdjustExtract)
+    print("剩余流量")
+    print(remainedFlowUpdate)
+    print()
+
+    reallocatedScale = len(layerToBeReallocated)
+    layerToBeReallocated[reallocatedScale-1] = flowAdjustExtract
+    layerToBeReallocated.append(remainedFlowUpdate)
     for i in range(len(layerToBeReallocated)):
         print(layerToBeReallocated[i])
     # BucketId  = get_list_inorder(baseList=, order=)
-
     return
 
 
-def flow_append(splitLayerSelected, splitBucketSelected, splitFlowRate, expBucketStructureList, layerWholeAllocated, bucketSum):
+def recycle_flow(expLayerSelected, expFlowAllocated, expBucketWholeStructureList, layerWholeAllocated, bucketSum):
+    remainedFlowUpdate = []
+    flowAdjustExtract = []
+    for i in range(len(expBucketWholeStructureList)):
+        print(expBucketWholeStructureList[i])
+    experimentFlowList = expBucketWholeStructureList[expLayerSelected - 1]
+    layerToBeReallocated = layerWholeAllocated[expLayerSelected - 1]
 
+    reduceExperimentNums = round(expFlowAllocated * bucketSum)
+    print(reduceExperimentNums)
+
+    print("层 \033[36m" + str(expLayerSelected) + "\033[0m 各流量分配的实验情况")
+    for i in range(len(experimentFlowList)):
+        print(experimentFlowList[i])
+    remainedBuckets = experimentFlowList[i]
+    remainedFlow = layerToBeReallocated[i]
+
+    print("额外增加的流量")
+    print(flowAdjustExtract)
+    print("剩余流量")
+    print(remainedFlowUpdate)
+    print()
+
+    reallocatedScale = len(layerToBeReallocated)
+    layerToBeReallocated[reallocatedScale - 1] = flowAdjustExtract
+    layerToBeReallocated.append(remainedFlowUpdate)
+    for i in range(len(layerToBeReallocated)):
+        print(layerToBeReallocated[i])
     return
 
 
@@ -805,7 +958,6 @@ def regionId_flow_gen(userIdFlow, regionRate):
         else:
             regionIdFlow.append(otherRegion)
     return regionIdFlow
-
 
 
 def region_division(userIdFlow ,regionIdFlow):

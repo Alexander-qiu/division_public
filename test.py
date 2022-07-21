@@ -92,38 +92,38 @@ if __name__ == '__main__':
     # print("此时各实验层的流量结构如下所示")
     # print(expRateList)
 
-    # 减少流量的操作
-    try:
-        print()
-        print("\033[31m> 对第" + str(splitLayerSelected) + "层进行减少流量操作 \033[0m")
-        layerAdjustedOut = flow_reduce_inOrder(splitLayerSelected=splitLayerSelected,
-                                               splitBucketSelected=splitBucketSelected,
-                                               splitFlowRate=splitFlowRate, expMarkPointList=expMarkPointList,
-                                               layerWholeAllocated=layerWholeAllocated, bucketSum=bucketSum)
-        print("成功对第\033[36m " + str(splitLayerSelected) + " \033[0m层第\033[36m " + str(splitBucketSelected)
-              + " \033[0m实验减少\033[36m " + str(splitFlowRate * 100) + "% \033[0m流量")
-    except:
-        print()
-        print("\033[35m输入流量参数错误，清重新核对流量数据后输入！\033[0m")
+    # # 减少流量的操作
+    # try:
+    #     print()
+    #     print("\033[31m> 对第" + str(splitLayerSelected) + "层进行减少流量操作 \033[0m")
+    #     layerAdjustedOut = flow_reduce_inOrder(splitLayerSelected=splitLayerSelected,
+    #                                            splitBucketSelected=splitBucketSelected,
+    #                                            splitFlowRate=splitFlowRate, expMarkPointList=expMarkPointList,
+    #                                            layerWholeAllocated=layerWholeAllocated, bucketSum=bucketSum)
+    #     print("成功对第\033[36m " + str(splitLayerSelected) + " \033[0m层第\033[36m " + str(splitBucketSelected)
+    #           + " \033[0m实验减少\033[36m " + str(splitFlowRate * 100) + "% \033[0m流量")
+    # except:
+    #     print()
+    #     print("\033[35m输入流量参数错误，清重新核对流量数据后输入！\033[0m")
 
     # chose to append flow
     appendLayerSelected = 1
     appendBucketSelected = 1
     appendFlowRate = 0.01
 
-    # 增加流量的操作
-    try:
-        print()
-        print("\033[31m> 对第" + str(appendLayerSelected) + "层增加流量操作 \033[0m")
-        layerAppendOut = flow_add_inOrder(splitLayerSelected=appendLayerSelected, splitBucketSelected=appendBucketSelected,
-                                          splitFlowRate=appendFlowRate, expMarkPointList=expMarkPointList,
-                                          layerWholeAllocated=layerWholeAllocated, bucketSum=bucketSum)
-        print("成功对第\033[36m " + str(appendLayerSelected) + " \033[0m层第\033[36m " + str(appendBucketSelected)
-              + " \033[0m实验增加\033[36m " + str(appendFlowRate * 100) + "% \033[0m流量")
-
-    except:
-        print()
-        print("\033[35m输入流量参数错误，清重新核对流量数据后输入！\033[0m")
+    # # 增加流量的操作
+    # try:
+    #     print()
+    #     print("\033[31m> 对第" + str(appendLayerSelected) + "层增加流量操作 \033[0m")
+    #     layerAppendOut = flow_add_inOrder(splitLayerSelected=appendLayerSelected, splitBucketSelected=appendBucketSelected,
+    #                                       splitFlowRate=appendFlowRate, expMarkPointList=expMarkPointList,
+    #                                       layerWholeAllocated=layerWholeAllocated, bucketSum=bucketSum)
+    #     print("成功对第\033[36m " + str(appendLayerSelected) + " \033[0m层第\033[36m " + str(appendBucketSelected)
+    #           + " \033[0m实验增加\033[36m " + str(appendFlowRate * 100) + "% \033[0m流量")
+    #
+    # except:
+    #     print()
+    #     print("\033[35m输入流量参数错误，清重新核对流量数据后输入！\033[0m")
 
     print()
     print("baseline的规模大小")
@@ -156,10 +156,6 @@ if __name__ == '__main__':
 
 
 
-
-
-
-
     # 更改减小流量的操作逻辑
     splitLayerSelected = 2
     splitBucketSelected = 3
@@ -167,18 +163,17 @@ if __name__ == '__main__':
     print()
     print("此时各实验层的流量结构如下所示")
     print(expRateList)
-    for i in range(len(layerWholeAllocated)):
-        print("第"+ str(i+1) + "层：" )
-        for j in range(len(layerWholeAllocated[i])):
-            print(layerWholeAllocated[i][j])
+    # for i in range(len(layerWholeAllocated)):
+    #     print("第" + str(i+1) + "层：" )
+    #     for j in range(len(layerWholeAllocated[i])):
+    #         print(layerWholeAllocated[i][j])
 
     expBucketWholeStructureList = []
     for i in range(len(expMarkPointList)):
         expBucketStructureList =[]
         expMarkPointSelected = expMarkPointList[i]
         expMarkPointSelected.append(bucketSum)
-        print()
-        print(expMarkPointSelected)
+        # print(expMarkPointSelected)
         for i in range(len(expMarkPointSelected) - 1):
             cont = expMarkPointSelected[i]
             expBucketSingleLayer = []
@@ -186,24 +181,24 @@ if __name__ == '__main__':
                 expBucketSingleLayer.append(round(cont))
                 cont += 1
             expBucketStructureList.append(expBucketSingleLayer)
-        for i in range(len(expBucketStructureList)):
-            print(expBucketStructureList[i])
+        # for i in range(len(expBucketStructureList)):
+        #     print(expBucketStructureList[i])
+        expBucketWholeStructureList.append(expBucketStructureList)
 
 
     # 存储了结构的信息 expBucketWholeStructureList
-    # 减少流量的操作
+    print()
+    print("\033[31m> 对第" + str(splitLayerSelected) + "层进行减少流量操作 \033[0m")
+    expSelectedRate = expRateList[splitLayerSelected]
+    print(expSelectedRate)
+    expSelectedRate[splitBucketSelected - 1] += splitFlowRate
+    print("调整流量后的")
+    print(expSelectedRate)
+    [layerAdjustedOut, experimentFlowList] \
+        = flow_reduce(splitLayerSelected=splitLayerSelected,
+                      splitBucketSelected=splitBucketSelected,
+                      splitFlowRate=splitFlowRate, expBucketWholeStructureList=expBucketWholeStructureList,
+                      layerWholeAllocated=layerWholeAllocated, bucketSum=bucketSum)
 
-    try:
-        print()
-        print("\033[31m> 对第" + str(splitLayerSelected) + "层进行减少流量操作 \033[0m")
-        layerAdjustedOut = flow_reduce(splitLayerSelected=splitLayerSelected,
-                                       splitBucketSelected=splitBucketSelected,
-                                       splitFlowRate=splitFlowRate, expBucketWholeStructureList=expBucketWholeStructureList,
-                                       layerWholeAllocated=layerWholeAllocated, bucketSum=bucketSum)
-        print("成功对第\033[36m " + str(splitLayerSelected) + " \033[0m层第\033[36m " + str(splitBucketSelected)
-              + " \033[0m实验减少\033[36m " + str(splitFlowRate * 100) + "% \033[0m流量")
-    except:
-        print()
-        print("\033[35m输入流量参数错误，清重新核对流量数据后输入！\033[0m")
-
-
+    print("成功对第\033[36m " + str(splitLayerSelected) + " \033[0m层第\033[36m " + str(splitBucketSelected)
+              + " \033[0m实验增加\033[36m " + str(splitFlowRate * 100) + "% \033[0m流量")
